@@ -317,6 +317,7 @@ def delFiles(update, context):
         DelFunc("Others", update)
 
 def move(user):
+    makedirs(f"MusicFiles/{user}", exist_ok=True)
     if glob(f"Others/{user}/*"):
         system(f"mv Others/{user}/* MusicFiles/{user}/")
     if glob(f"ImageFiles/{user}/*"):
@@ -354,7 +355,7 @@ def mkrar(query, user):
 
 def get_archive(update, context):
     user = update.effective_user["id"]
-    if not path.exists(f"MusicFiles/{user}") or listdir(f"MusicFiles/{user}") == []:
+    if (not path.exists(f"MusicFiles/{user}") or listdir(f"MusicFiles/{user}") == []) and (not path.exists(f"ImageFiles/{user}") or listdir(f"ImageFiles/{user}") == []) and (not path.exists(f"Others/{user}") or listdir(f"Others/{user}") == []):
         reply(update, "ERROR\! You didnt give me any files\!")
         return
 
