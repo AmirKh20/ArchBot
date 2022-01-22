@@ -4,8 +4,8 @@ Archive your files and make PDF of your images
 ## usage
 1- clone the repository then install the requirements:
 ```bash
-    $ pip3 install -r requirements.txt
-    # apt install zip rar graphicsmagick
+$ pip3 install -r requirements.txt
+# apt install zip rar graphicsmagick
 ```
 2- set `BOT_TOKEN`, `FLASK_PORT`, `API_HASH`, `API_ID` in `.env` file
 
