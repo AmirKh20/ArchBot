@@ -11,6 +11,7 @@ from hashlib import md5
 from re import search
 from glob import glob
 from waitress import serve
+from subprocess import check_output
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -22,6 +23,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.debug = False
+port = getenv("FLASK_PORT")
+ip = check_output(['hostname', '-I']).strip().decode('utf-8')
 
 def reply(update, message):
     return update.message.reply_markdown_v2(message, reply_to_message_id = update.message.message_id)
@@ -325,7 +328,7 @@ def mktar(query, user):
     move(user)
     system(f"tar czf archiveFiles/{filepath} -C MusicFiles/{user} . --remove-files")
     arch_message.edit_text("Finished!")
-    return "http://185.221.237.253:8080/Downloads/" + filepath
+    return f"http://{ip}:{port}/Downloads/" + filepath
 
 def mkzip(query, user):
     filepath = f'{user}/{md5( (str(time()) + str(user)).encode() ).hexdigest()}.zip'
@@ -336,7 +339,7 @@ def mkzip(query, user):
     chdir("../../")
     arch_message.edit_text("Finished!")
     rmtree(f"MusicFiles/{user}")
-    return "http://185.221.237.253:8080/Downloads/" + filepath
+    return f"http://{ip}:{port}/Downloads/" + filepath
 
 def mkrar(query, user):
     filepath = f'{user}/{md5( (str(time()) + str(user)).encode() ).hexdigest()}.rar'
@@ -347,7 +350,7 @@ def mkrar(query, user):
     chdir("../../")
     arch_message.edit_text("Finished!")
     rmtree(f"MusicFiles/{user}")
-    return "http://185.221.237.253:8080/Downloads/" + filepath
+    return f"http://{ip}:{port}/Downloads/" + filepath
 
 def get_archive(update, context):
     user = update.effective_user["id"]
@@ -390,7 +393,7 @@ def get_pdf(update, context):
     pdf_message.edit_text("Finished Creating!")
 
     if update.message.text == "Link 🌐":
-        link = "http://185.221.237.253:8080/Downloads/" + filepath
+        link = f"http://{ip}:{port}/Downloads/" + filepath
         context.bot.send_message(chat_id = update.effective_chat.id, text = link)
         DefaultKeyboard(update, None)
     else:
@@ -447,7 +450,7 @@ def main() -> None:
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
     updater.start_polling()
-    serve(app, host="0.0.0.0", port = int(getenv("FLASK_PORT")))
+    serve(app, host="0.0.0.0", port = int(port))
 
     updater.idle()
 
