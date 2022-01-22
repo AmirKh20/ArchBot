@@ -109,8 +109,8 @@ def DownImages(update, context):
     image = context.bot.getFile(update.message.photo[-1].file_id)
     user = update.effective_user["id"]
     makedirs(f"ImageFiles/{user}", exist_ok=True)
-    filename = GetSortedName(user, "ImageFiles", "jpg")
-    #print(update.message.photo[-1].file_unique_id)
+    filename = GetSortedName(user, "ImageFiles", "jpg") + update.message.photo[-1].file_unique_id + ".jpg"
+    #filename = GetSortedName(user, "ImageFiles", "jpg")
 
     #TODO: Hash checking ....
 #    if path.exists(f"ImageFiles/{user}/{filename}"):
@@ -139,7 +139,6 @@ def DownGif(update, context):
     gif.download(f"./Others/{user}/{filename}")
     down_message.edit_text(f"Finished!\n{len(glob(f'Others/{user}/*.gif'))} Files Have Been Downloaded")
 
-    #print(update.message.animation)
 
 def DownVideo(update, context):
     if update.message.video.file_size >= 20971520:
@@ -147,7 +146,8 @@ def DownVideo(update, context):
     video = context.bot.getFile(update.message.video.file_id)
     user = update.effective_user["id"]
     makedirs(f"Others/{user}", exist_ok=True)
-    filename = GetSortedName(user, "Others", "mp4")
+    filename = GetSortedName(user, "Others", "mp4") + update.message.video.file_unique_id + ".mp4"
+    #filename = GetSortedName(user, "Others", "mp4")
 
     #TODO: Hash checking ....
 #    if path.exists(f"Others/{user}/{filename}"):
@@ -443,10 +443,10 @@ def main() -> None:
     dispatcher.add_handler(MessageHandler(Filters.audio, DownAudio))
     dispatcher.add_handler(MessageHandler(Filters.animation, DownGif))
     dispatcher.add_handler(MessageHandler(Filters.video, DownVideo))
+    dispatcher.add_handler(MessageHandler(Filters.photo, DownImages))
     #TODO: Download Voices under 20 MB
     #TODO: Be able to download files with the same name but check them with md5
     dispatcher.add_handler(MessageHandler(Filters.document, DownFiles))
-    dispatcher.add_handler(MessageHandler(Filters.photo, DownImages))
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
     updater.start_polling()
