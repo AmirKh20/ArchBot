@@ -1,5 +1,5 @@
-python-telegram-bot
-python-dotenv
-flask
-waitress
-telethon
+python-telegram-bot==13.10
+python-dotenv==0.19.2
+Flask==2.0.2
+waitress==2.0.0
+telethon==1.24.0
