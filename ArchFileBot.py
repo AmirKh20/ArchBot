@@ -40,14 +40,14 @@ def DefaultKeyboard(update, message):
     else:
         update.message.reply_markdown_v2("Back to the main menu 🔙", reply_markup=ReplyKeyboardMarkup(button, one_time_keyboard=False))
 
-def start(update: Update, context: CallbackContext) -> None:
+def start(update, context):
     user = update.effective_user
     DefaultKeyboard(update, f"Hi {user.mention_markdown_v2()}\!")
 
-def help_command(update: Update, context: CallbackContext) -> None:
+def help_command(update, context):
     update.message.reply_text('Send /arch for making archive files after you sent your audios\n/ls for listing the files\n/rm for removing and re-sending the files')
 
-def echo(update: Update, context: CallbackContext):
+def echo(update, context):
     update.message.reply_text(f"I don't know what you're taking about {update.effective_user['first_name']} 🤷")
 
 def DownFiles(update, context):
