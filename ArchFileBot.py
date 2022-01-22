@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.debug = False
 port = getenv("FLASK_PORT")
-ip = check_output(['hostname', '-I']).strip().decode('utf-8')
+ip = check_output(['hostname', '-I']).strip().decode()
 
 def reply(update, message):
     return update.message.reply_markdown_v2(message, reply_to_message_id = update.message.message_id)
