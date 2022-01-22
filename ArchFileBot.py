@@ -313,14 +313,16 @@ def delFiles(update, context):
         DelFunc("pdfs", update)
         DelFunc("Others", update)
 
-def mv_others(user):
+def move(user):
     if glob(f"Others/{user}/*"):
         system(f"mv Others/{user}/* MusicFiles/{user}/")
+    if glob(f"ImageFiles/{user}/*"):
+        system(f"mv ImageFiles/{user}/* MusicFiles/{user}/")
 
 def mktar(query, user):
     filepath = f'{user}/{md5( (str(time()) + str(user)).encode() ).hexdigest()}.tar.gz'
     arch_message = query.edit_message_text(text="Archiving...")
-    mv_others(user)
+    move(user)
     system(f"tar czf archiveFiles/{filepath} -C MusicFiles/{user} . --remove-files")
     arch_message.edit_text("Finished!")
     return "http://185.221.237.253:8080/Downloads/" + filepath
@@ -328,7 +330,7 @@ def mktar(query, user):
 def mkzip(query, user):
     filepath = f'{user}/{md5( (str(time()) + str(user)).encode() ).hexdigest()}.zip'
     arch_message = query.edit_message_text(text="Archiving...")
-    mv_others(user)
+    move(user)
     chdir(f"MusicFiles/{user}")
     system(f"zip -qq ../../archiveFiles/{filepath} *")
     chdir("../../")
@@ -339,7 +341,7 @@ def mkzip(query, user):
 def mkrar(query, user):
     filepath = f'{user}/{md5( (str(time()) + str(user)).encode() ).hexdigest()}.rar'
     arch_message = query.edit_message_text(text="Archiving...")
-    mv_others(user)
+    move(user)
     chdir(f"MusicFiles/{user}")
     system(f"rar a ../../archiveFiles/{filepath} * >>/dev/null")
     chdir("../../")
