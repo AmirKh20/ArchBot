@@ -13,7 +13,7 @@ client = TelegramClient('telethon_session', api_id, api_hash)
 
 def GetDirName(mime_type):
     if search("audio/.+", mime_type):
-        return "MusicFiles"
+        return "AudioFiles"
     elif search("image/.+", mime_type):
         return "ImageFiles"
     else:
