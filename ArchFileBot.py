@@ -59,7 +59,7 @@ def DownFiles(update, context):
     file = context.bot.getFile(update.message.document.file_id)
 
     if search("audio/.+",update.message.document.mime_type):
-        directory = "MusicFiles"
+        directory = "AudioFiles"
     elif search("image/.+",update.message.document.mime_type):
         directory = "ImageFiles"
     else:
@@ -80,16 +80,16 @@ def DownAudio(update, context):
 
     audio = context.bot.getFile(update.message.audio.file_id)
     user = update.effective_user["id"]
-    makedirs(f"MusicFiles/{user}", exist_ok=True)
+    makedirs(f"AudioFiles/{user}", exist_ok=True)
     filename = update.message.audio.file_name
 
-    if path.exists(f"MusicFiles/{user}/{filename}"):
+    if path.exists(f"AudioFiles/{user}/{filename}"):
         reply(update, "File has alredy been downloaded\! See The list with /ls or send 'List 🗄'")
         return
 
     down_message = reply(update, "Downloading\.\.\.")
-    audio.download(f"./MusicFiles/{user}/{filename}")
-    down_message.edit_text(f"Finished!\n{len(listdir(f'MusicFiles/{user}'))} Files Have been Downloaded")
+    audio.download(f"./AudioFiles/{user}/{filename}")
+    down_message.edit_text(f"Finished!\n{len(listdir(f'AudioFiles/{user}'))} Files Have been Downloaded")
 
 def GetSortedName(user, directory, extension):
     files = glob(f"{directory}/{user}/*.{extension}")
@@ -159,8 +159,8 @@ def DownVideo(update, context):
 
 
 def GetSelectedList(directory):
-    if directory == "MusicFiles":
-        selectedList = "Musics 🎵"
+    if directory == "AudioFiles":
+        selectedList = "Audios 🎵"
     elif directory == "ImageFiles":
         selectedList = "Images 🖼"
     elif directory == "archiveFiles":
@@ -187,7 +187,7 @@ def listFiles(update, context):
     user = update.effective_user["id"]
     if update.message.text == "List 🗄" or update.message.text == "/ls":
         button = [
-                [KeyboardButton("List Musics 🎵"), KeyboardButton("List Images 🖼")],
+                [KeyboardButton("List Audios 🎵"), KeyboardButton("List Images 🖼")],
                 [KeyboardButton("List Archive Files 📦"), KeyboardButton("List PDFs 📄")],
                 [KeyboardButton("List Others 🌀"), KeyboardButton("List All 🗄")],
                 [KeyboardButton("Back To Main Menu 🔙")]
@@ -195,8 +195,8 @@ def listFiles(update, context):
         update.message.reply_markdown_v2("Which one?", reply_to_message_id = update.message.message_id, reply_markup=ReplyKeyboardMarkup(button, one_time_keyboard=False))
         return
 
-    elif update.message.text == "List Musics 🎵":
-        listFunc("MusicFiles", update)
+    elif update.message.text == "List Audios 🎵":
+        listFunc("AudioFiles", update)
 
     elif update.message.text == "List Images 🖼":
         listFunc("ImageFiles", update)
@@ -211,7 +211,7 @@ def listFiles(update, context):
         listFunc("Others", update)
 
     elif update.message.text == "List All 🗄":
-        listFunc("MusicFiles", update)
+        listFunc("AudioFiles", update)
         listFunc("ImageFiles", update)
         listFunc("archiveFiles", update)
         listFunc("pdfs", update)
@@ -285,7 +285,7 @@ def InlineButtons(update, context):
 def delFiles(update, context):
     if update.message.text == "Remove Files 🗑" or update.message.text == "/rm":
         button = [
-                [KeyboardButton("Delete Musics 🎵"), KeyboardButton("Delete Images 🖼")],
+                [KeyboardButton("Delete Audios 🎵"), KeyboardButton("Delete Images 🖼")],
                 [KeyboardButton("Delete Archive Files 📦"), KeyboardButton("Delete PDFs 📄")],
                 [KeyboardButton("Delete Others 🌀"), KeyboardButton("Delete All 🗑")],
                 [KeyboardButton("Back To Main Menu 🔙")]
@@ -294,8 +294,8 @@ def delFiles(update, context):
                                                         reply_markup=ReplyKeyboardMarkup(button, one_time_keyboard=False))
         return
 
-    if update.message.text == "Delete Musics 🎵":
-        InlineDelete("MusicFiles", update)
+    if update.message.text == "Delete Audios 🎵":
+        InlineDelete("AudioFiles", update)
 
     elif update.message.text == "Delete Images 🖼":
         InlineDelete("ImageFiles", update)
@@ -310,24 +310,24 @@ def delFiles(update, context):
         InlineDelete("Others", update)
 
     elif update.message.text == "Delete All 🗑":
-        DelFunc("MusicFiles", update)
+        DelFunc("AudioFiles", update)
         DelFunc("ImageFiles", update)
         DelFunc("archiveFiles", update)
         DelFunc("pdfs", update)
         DelFunc("Others", update)
 
 def move(user):
-    makedirs(f"MusicFiles/{user}", exist_ok=True)
+    makedirs(f"AudioFiles/{user}", exist_ok=True)
     if glob(f"Others/{user}/*"):
-        system(f"mv Others/{user}/* MusicFiles/{user}/")
+        system(f"mv Others/{user}/* AudioFiles/{user}/")
     if glob(f"ImageFiles/{user}/*"):
-        system(f"mv ImageFiles/{user}/* MusicFiles/{user}/")
+        system(f"mv ImageFiles/{user}/* AudioFiles/{user}/")
 
 def mktar(query, user):
     filepath = f'{user}/{md5( (str(time()) + str(user)).encode() ).hexdigest()}.tar.gz'
     arch_message = query.edit_message_text(text="Archiving...")
     move(user)
-    system(f"tar czf archiveFiles/{filepath} -C MusicFiles/{user} . --remove-files")
+    system(f"tar czf archiveFiles/{filepath} -C AudioFiles/{user} . --remove-files")
     arch_message.edit_text("Finished!")
     return f"http://{ip}:{port}/Downloads/" + filepath
 
@@ -335,27 +335,27 @@ def mkzip(query, user):
     filepath = f'{user}/{md5( (str(time()) + str(user)).encode() ).hexdigest()}.zip'
     arch_message = query.edit_message_text(text="Archiving...")
     move(user)
-    chdir(f"MusicFiles/{user}")
+    chdir(f"AudioFiles/{user}")
     system(f"zip -qq ../../archiveFiles/{filepath} *")
     chdir("../../")
     arch_message.edit_text("Finished!")
-    rmtree(f"MusicFiles/{user}")
+    rmtree(f"AudioFiles/{user}")
     return f"http://{ip}:{port}/Downloads/" + filepath
 
 def mkrar(query, user):
     filepath = f'{user}/{md5( (str(time()) + str(user)).encode() ).hexdigest()}.rar'
     arch_message = query.edit_message_text(text="Archiving...")
     move(user)
-    chdir(f"MusicFiles/{user}")
+    chdir(f"AudioFiles/{user}")
     system(f"rar a ../../archiveFiles/{filepath} * >>/dev/null")
     chdir("../../")
     arch_message.edit_text("Finished!")
-    rmtree(f"MusicFiles/{user}")
+    rmtree(f"AudioFiles/{user}")
     return f"http://{ip}:{port}/Downloads/" + filepath
 
 def get_archive(update, context):
     user = update.effective_user["id"]
-    if (not path.exists(f"MusicFiles/{user}") or listdir(f"MusicFiles/{user}") == []) and (not path.exists(f"ImageFiles/{user}") or listdir(f"ImageFiles/{user}") == []) and (not path.exists(f"Others/{user}") or listdir(f"Others/{user}") == []):
+    if (not path.exists(f"AudioFiles/{user}") or listdir(f"AudioFiles/{user}") == []) and (not path.exists(f"ImageFiles/{user}") or listdir(f"ImageFiles/{user}") == []) and (not path.exists(f"Others/{user}") or listdir(f"Others/{user}") == []):
         reply(update, "ERROR\! You didnt give me any files\!")
         return
 
@@ -430,13 +430,13 @@ def main() -> None:
                                          Filters.regex("^Link 🌐$") | Filters.regex("^File With Random Name 📁$") | Filters.regex(".+\.pdf$"), get_pdf))
 
     dispatcher.add_handler(MessageHandler(Filters.regex('^List 🗄$') |
-                                        Filters.regex('^List Musics 🎵$') | Filters.regex('^List Images 🖼$') |
+                                        Filters.regex('^List Audios 🎵$') | Filters.regex('^List Images 🖼$') |
                                         Filters.regex("^List Archive Files 📦$") | Filters.regex("^List PDFs 📄$") |
                                         Filters.regex("^List All 🗄$") | Filters.regex("^List Others 🌀$") |
                                         Filters.regex("^Back To Main Menu 🔙$"), listFiles))
 
     dispatcher.add_handler(MessageHandler(Filters.regex('^Remove Files 🗑$') |
-                                         Filters.regex("^Delete Musics 🎵$") | Filters.regex("^Delete Images 🖼$") |
+                                         Filters.regex("^Delete Audios 🎵$") | Filters.regex("^Delete Images 🖼$") |
                                          Filters.regex("^Delete Archive Files 📦$") | Filters.regex("^Delete PDFs 📄$") |
                                          Filters.regex("^Delete Others 🌀$") | Filters.regex("^Delete All 🗑$"), delFiles))
 
